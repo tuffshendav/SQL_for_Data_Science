@@ -1,0 +1,187 @@
+Find all the tracks that have a length of 5,000,000 milliseconds or more.
+
+Select
+Name,
+Milliseconds
+From Tracks
+Where Milliseconds > '5000000'
+
+Find all the invoices whose total is between $5 and $15 dollars.
+
+Select
+InvoiceId,
+Total
+From Invoices
+Where Total between "5" and "15"
+
+ Find all the customers from the following States: RJ, DF, AB, BC, CA, WA, NY.
+ 
+Select
+State,
+FirstName,
+LastName,
+Company
+From Customers
+Where State in ('RJ','DF','AB','BC','CA','WA','NY');
+
+Find all the invoices for customer 56 and 58 where the total was between $1.00 and $5.00.
+
+Select
+InvoiceId,
+InvoiceDate,
+CustomerId,
+Total
+From Invoices
+Where CustomerId = '58' and (Total between "1" and "5")
+
+Find all the tracks whose name starts with 'All'.
+
+Select
+Name
+From Tracks
+where Name like 'All%'
+
+Find all the customer emails that start with "J" and are from gmail.com.
+
+Select
+Email
+From Customers
+Where Email like 'J%' 
+
+Find all the invoices from the billing city Brasília, Edmonton, and Vancouver and sort in descending order by invoice ID.
+
+Select
+InvoiceId,
+BillingCity,
+Total
+From Invoices
+Where BillingCity in ('Brasília' , 'Edmonton' , 'Vancouver')
+order by InvoiceId desc
+
+Show the number of orders placed by each customer (hint: this is found in the invoices table) and 
+sort the result by the number of orders in descending order.
+
+Select
+CustomerId,
+Count(InvoiceId) as number_of_orders
+From Invoices
+Group by CustomerId
+Order by number_of_orders desc
+
+Find the albums with 12 or more tracks.
+
+Select
+AlbumId,
+Count(TrackId) as track_count
+From Tracks
+Group by AlbumId
+Having Count(TrackId) >=12;
+
+Using a subquery, find the names of all the tracks for the album "Californication".
+
+select Tracks.Name,Albums.Title
+from Tracks
+left join Albums
+on Tracks.AlbumId=Albums.AlbumId
+where Albums.Title="Californication";
+
+Find the total number of invoices for each customer along with the customer's full name, city and email.
+
+select a.FirstName,a.LastName,a.City,a.Email,count(a.InvoiceId) as TotalNum
+from
+(select Customers.FirstName,Customers.LastName,Customers.City,
+Customers.Email,Invoices.InvoiceId
+from Customers
+left join Invoices
+on Customers.CustomerId=Invoices.CustomerId) as a
+group by a.FirstName
+having a.FirstName="František";
+
+Retrieve the track name, album, artistID, and trackID for all the albums.
+
+select Tracks.Name,Tracks.TrackId,Albums.Title,Albums.ArtistId
+from Tracks
+left join Albums
+on Tracks.AlbumId=Albums.AlbumId
+where Albums.Title like "For Those About to Rock We Salute You" 
+and Tracks.TrackId=12;
+
+Retrieve a list with the managers last name, and the last name of the employees who report to him or her.
+
+select a.LastName as EmployeeLast,a.ReportsTo,b.LastName as ManagerLast
+from Employees as a
+left join Employees as b
+on a.ReportsTo=b.EmployeeId
+where b.LastName like "Mitchell"
+
+Find the name and ID of the artists who do not have albums.
+
+select a.Name,count(a.Name)
+from
+(select Artists.ArtistId,Artists.Name,Albums.AlbumId
+from Artists
+left join Albums
+on Artists.ArtistId=Albums.ArtistId
+where Albums.AlbumId is null) as a
+group by a.Name
+order by count(a.Name) desc
+
+Use a UNION to create a list of all the employee's and customer's first names and last names
+ordered by the last name in descending order.
+
+select FirstName, LastName from Employees
+union
+select FirstName,LastName from Customers
+order by LastName desc
+
+See if there are any customers who have a different city listed in their billing city versus their customer city.
+
+select Customers.FirstName,Customers.City,Invoices.BillingCity
+from Customers
+left join Invoices
+on Customers.CustomerId=Invoices.CustomerId
+where Customers.City<>Invoices.BillingCity
+
+Pull a list of customer ids with the customer’s full name, and address, along with combining their city and country together.
+Be sure to make a space in between these two and make it UPPER CASE.
+
+select CustomerId,FirstName,LastName, Address,
+upper(City || ' ' || Country) as CityCountry 
+from Customers
+where CustomerId=16
+
+Create a new employee user id by combining the first 4 letters of the employee’s first name with the first 2 letters of the employee’s last name.
+Make the new field lower case and pull each individual step to show your work.
+
+select FirstName,LastName,
+lower(substr(FirstName,1,4) || substr(LastName,1,2)) as NewId
+from Employees
+where FirstName like "Robert" and LastName like "King";
+
+Show a list of employees who have worked for the company for 15 or more years using the current date function.
+Sort by lastname ascending.
+
+select LastName,HireDate,strftime('%Y',HireDate) as year,
+2019-strftime('%Y',HireDate) as HireYear
+from Employees
+order by LastName asc
+
+Find the cities with the most customers and rank in descending order.
+
+select City,CustomerId,count(CustomerId) as Count
+from Customers
+group by City
+having Count=2
+
+Create a new customer invoice id by combining a customer’s invoice id with their first and last name while ordering your query in the
+following order: firstname, lastname, and invoiceID.
+
+select a.FirstName,a.LastName,a.InvoiceId,
+a.FirstName || a.LastName || a.InvoiceId as NewInvoiceId
+from
+(select i.InvoiceId,c.FirstName,c.LastName
+from Invoices as i
+left join Customers as c
+on i.CustomerId=c.CustomerId) as a
+where a.FirstName like "Astrid"
+
